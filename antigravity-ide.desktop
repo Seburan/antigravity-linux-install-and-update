@@ -1,0 +1,11 @@
+[Desktop Entry]
+Name=Antigravity IDE
+Comment=Antigravity Agentic IDE
+Exec=/opt/antigravity/antigravity-ide %U
+Terminal=false
+Type=Application
+Icon=/opt/antigravity/resources/app/resources/linux/code.png
+Categories=Development;IDE;
+StartupNotify=true
+StartupWMClass=Antigravity
+MimeType=x-scheme-handler/antigravity;
