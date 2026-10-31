@@ -1,1 +1,1 @@
-update.sh
+install-ide.sh

@@ -1,0 +1,11 @@
+[Desktop Entry]
+Name=Antigravity
+Comment=Antigravity Agentic Desktop Application
+Exec=/opt/antigravity-app/antigravity %U
+Terminal=false
+Type=Application
+Icon=/opt/antigravity-app/icon.png
+Categories=Development;
+StartupNotify=true
+StartupWMClass=antigravity
+MimeType=x-scheme-handler/antigravity;
