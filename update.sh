@@ -73,11 +73,23 @@ if [[ -z "$EXTRACTED_DIR" || ! -f "$EXTRACTED_DIR/antigravity-ide" ]]; then
     exit 1
 fi
 
+if [[ -f "$EXTRACTED_DIR/resources/app/product.json" ]]; then
+    TARGET_VERSION=$(python3 -c "import json; p = json.load(open('$EXTRACTED_DIR/resources/app/product.json')); print(p.get('ideVersion') or p.get('version', ''))" 2>/dev/null || true)
+    if [[ -n "$TARGET_VERSION" ]]; then
+        echo -e "${GREEN}Detected package version:${NC} ${BOLD}v${TARGET_VERSION}${NC}"
+    fi
+fi
+
 # 3. Prepare Target Directory / Backup Current Installation
 if [[ -d "$INSTALL_DIR" ]]; then
+    CURRENT_VERSION=$(python3 -c "import json; p = json.load(open('$INSTALL_DIR/resources/app/product.json')); print(p.get('ideVersion') or p.get('version', ''))" 2>/dev/null || true)
     TIMESTAMP=$(date +"%Y%m%d_%H%M%S")
     BACKUP_DIR="$HOME/.antigravity_backup_$TIMESTAMP"
-    echo -e "\n${BLUE}[2/6] Backing up existing installation to:${NC} $BACKUP_DIR"
+    if [[ -n "$CURRENT_VERSION" ]]; then
+        echo -e "\n${BLUE}[2/6] Backing up existing installation (v${CURRENT_VERSION}) to:${NC} $BACKUP_DIR"
+    else
+        echo -e "\n${BLUE}[2/6] Backing up existing installation to:${NC} $BACKUP_DIR"
+    fi
     mkdir -p "$BACKUP_DIR"
     cp -a "$INSTALL_DIR/." "$BACKUP_DIR/"
 else
@@ -86,9 +98,21 @@ else
     sudo chown -R "$USER:$USER" "$INSTALL_DIR"
 fi
 
+# Ensure target directory is owned by the current user
+if [[ ! -w "$INSTALL_DIR" ]]; then
+    echo -e "\n${BLUE}Adjusting ownership of $INSTALL_DIR (requires sudo)...${NC}"
+    sudo chown -R "$USER:$USER" "$INSTALL_DIR"
+fi
+
+# Remove existing chrome-sandbox before syncing because it is setuid root (mode 4755)
+# from the previous install, which prevents rsync as a standard user from updating its metadata.
+if [[ -f "$INSTALL_DIR/chrome-sandbox" ]]; then
+    rm -f "$INSTALL_DIR/chrome-sandbox" 2>/dev/null || sudo rm -f "$INSTALL_DIR/chrome-sandbox"
+fi
+
 # 4. Sync Files into /opt/antigravity
 echo -e "\n${BLUE}[3/6] Installing files into $INSTALL_DIR...${NC}"
-rsync -a --delete "$EXTRACTED_DIR/" "$INSTALL_DIR/"
+rsync -a --delete --no-owner --no-group "$EXTRACTED_DIR/" "$INSTALL_DIR/"
 
 # 5. Fix Chromium SUID Sandbox Permissions
 echo -e "\n${BLUE}[4/6] Configuring chrome-sandbox SUID permissions (requires sudo)...${NC}"
@@ -133,7 +157,14 @@ echo -e "${GREEN}✓ Desktop launcher installed at $DESKTOP_ENTRY_FILE${NC}"
 # Summary Output
 echo -e "\n${GREEN}${BOLD}=== ${ACTION_TYPE} Completed Successfully! ===${NC}"
 if [[ -f "$INSTALL_DIR/resources/app/product.json" ]]; then
-    python3 -c "import json; p = json.load(open('$INSTALL_DIR/resources/app/product.json')); print('Installed Version:', p.get('version', 'N/A'), '| Commit:', p.get('commit', 'N/A'), '| Date:', p.get('date', 'N/A'))" 2>/dev/null || true
+    python3 -c "
+import json
+p = json.load(open('$INSTALL_DIR/resources/app/product.json'))
+ide_ver = p.get('ideVersion') or p.get('version', 'N/A')
+base_ver = p.get('version', '')
+base_info = f' (VS Code base: {base_ver})' if p.get('ideVersion') and base_ver else ''
+print(f'Installed Version: \033[1m{ide_ver}\033[0m{base_info} | Commit: {p.get(\"commit\", \"N/A\")} | Date: {p.get(\"date\", \"N/A\")}')
+" 2>/dev/null || true
 fi
 
 echo -e "\nYou can launch Antigravity IDE via:"

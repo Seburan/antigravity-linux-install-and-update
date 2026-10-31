@@ -76,7 +76,8 @@ fi
 ```bash
 sudo mkdir -p /opt/antigravity
 sudo chown -R $USER:$USER /opt/antigravity
-rsync -a --delete "/tmp/antigravity_staging/Antigravity IDE/" /opt/antigravity/
+rm -f /opt/antigravity/chrome-sandbox
+rsync -a --delete --no-owner --no-group "/tmp/antigravity_staging/Antigravity IDE/" /opt/antigravity/
 rm -rf /tmp/antigravity_staging
 ```
 
@@ -163,7 +164,8 @@ If an update needs to be reverted, restore from the automatic backup:
 ls -d ~/.antigravity_backup_*
 
 # Restore backup
-rsync -a --delete ~/.antigravity_backup_YYYYMMDD_HHMMSS/ /opt/antigravity/
+rm -f /opt/antigravity/chrome-sandbox
+rsync -a --delete --no-owner --no-group ~/.antigravity_backup_YYYYMMDD_HHMMSS/ /opt/antigravity/
 sudo chown root:root /opt/antigravity/chrome-sandbox
 sudo chmod 4755 /opt/antigravity/chrome-sandbox
 ```
