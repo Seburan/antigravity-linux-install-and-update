@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # ==============================================================================
 # Antigravity IDE - Linux Install & Update Script (Ubuntu / Debian)
-# Repository: https://github.com/Seburan/antigravity-ide-linux-update
+# Repository: https://github.com/Seburan/antigravity-linux-install-and-update
 # ==============================================================================
 
 set -euo pipefail

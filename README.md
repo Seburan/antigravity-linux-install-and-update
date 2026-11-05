@@ -51,8 +51,8 @@ It supports both applications:
 2. Clone this repository and run the installer:
 
 ```bash
-git clone https://github.com/Seburan/antigravity-ide-linux-update.git
-cd antigravity-ide-linux-update
+git clone https://github.com/Seburan/antigravity-linux-install-and-update.git
+cd antigravity-linux-install-and-update
 chmod +x update-ide.sh update-app.sh
 ```
 
