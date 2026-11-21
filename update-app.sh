@@ -219,7 +219,10 @@ DESKTOP_EOF
 fi
 
 chmod +x "$DESKTOP_ENTRY_FILE"
-ln -sf "$DESKTOP_ENTRY_FILE" "$DESKTOP_ENTRY_DIR/antigravity.desktop"
+# Clean up legacy symlink that caused duplicate launcher entries in GNOME/Ubuntu
+if [[ -L "$DESKTOP_ENTRY_DIR/antigravity.desktop" ]]; then
+    rm -f "$DESKTOP_ENTRY_DIR/antigravity.desktop"
+fi
 update-desktop-database "$DESKTOP_ENTRY_DIR" 2>/dev/null || true
 echo -e "${GREEN}✓ Desktop launcher installed at $DESKTOP_ENTRY_FILE${NC}"
 

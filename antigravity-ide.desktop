@@ -7,5 +7,5 @@ Type=Application
 Icon=/opt/antigravity-ide/resources/app/resources/linux/code.png
 Categories=Development;IDE;
 StartupNotify=true
-StartupWMClass=Antigravity
+StartupWMClass=antigravity-ide
 MimeType=x-scheme-handler/antigravity;
